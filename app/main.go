@@ -41,10 +41,14 @@ func main() {
 		// fmt.Printf("checking args: %s\n", os.Args[1:])
 		sha := os.Args[len(os.Args)-1]
 		prefix := sha[0:2]
-		suffix := sha[3:]
+		suffix := sha[2:]
 
 		if slices.Contains(os.Args[1:], "-p") {
-			path := ".git/objects/" + prefix + "/" + suffix
+			dir, err := os.Getwd()
+			if err != nil {
+				log.Fatal(err)
+			}
+			path := dir + "/.git/objects/" + prefix + "/" + suffix
 			fmt.Println(readFile(path))
 		}
 	case "test":
@@ -56,14 +60,14 @@ func main() {
 
 }
 
-func readFile(file string) []byte {
+func readFile(file string) string {
 	b, err := os.ReadFile(file)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return decompress(b)
+	return string(decompress(b))
 }
 
 func decompress(compressedData []byte) []byte {
@@ -78,6 +82,12 @@ func decompress(compressedData []byte) []byte {
 	decompressedData, err := io.ReadAll(r)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	for i, value := range decompressedData {
+		if value == 0 {
+			return decompressedData[i+1:]
+		}
 	}
 
 	return decompressedData
