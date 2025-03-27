@@ -49,7 +49,7 @@ func main() {
 				log.Fatal(err)
 			}
 			path := dir + "/.git/objects/" + prefix + "/" + suffix
-			fmt.Println(readFile(path))
+			fmt.Print(readFile(path))
 		}
 	case "test":
 		fmt.Println("This is a test")
